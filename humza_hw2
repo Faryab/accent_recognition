@@ -1,0 +1,2030 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### This assignment consists of three parts: Part 1, Part 2 and Part 3. Part 1 are questions on probability. Part 2 is a toy problem to get you started with performing HMM using code from scratch. Part 2 is a HMM experiment on a real world dataset.\n",
+    "\n",
+    "#### We have also created a Python Cheatsheets folder on canvas to go along with the homework. It has basic cheatsheets to get started with jupyter notebook, sklearn, pandas, matplotlib, and, python basics. There is also going to be a [google document : linked](https://docs.google.com/document/u/1/d/1z7HEURIaF_V6Aa5ulQkApxzUFO48kjLXsNAFBesrO5g/edit?usp=sharing) based on questions asked by the students during office hours/piazza/class. This google doc will remain live through the course of the semester, and hence can be referred to at anytime.\n",
+    "\n",
+    "#### Remember that a lot of machine learning work requires you to look around, fork repositories, read documentation and test code snippets. It is a good idea to spend some time learning how to google for what you are looking for. Do not copy logic and code from sources, but know how to find the right toolkit, its usage and expected outputs.\n",
+    "\n",
+    "---"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### Setup (these setup instructions assume that you completed the setup from last assignment):\n",
+    " 1. Do pip3 pydub.\n",
+    " 2. Do pip3 python_speech_features.\n",
+    "\n",
+    "#### You can start jupyter using jupyter notebook in your terminal.\n",
+    "\n",
+    "---"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### Instructions for submission:\n",
+    "1. Complete the python notebook.We have added cells to prompt where you should be adding code or text answers. Please do not edit any other cells. You can add any number cells that you want to accomplish your work.\n",
+    "2. Jupyter Notebook allows you to write text in markdown. The text answers don’t need to be in markdown though for your evaluation (it just looks pretty!)\n",
+    "3. Please turn in your python notebook that has been run completely on Canvas. Along with that, you also need to submit the pdf version of your notebook on gradescope.\n",
+    "4. To create the pdf version, in the jupyter notebook, go to File -> Download As -> PDF via LaTex (.pdf)\n",
+    "5. For the answers that you need to write by hand, you can either write in LaTex in Markdown, or write on paper (cleanly), and upload as images to [ImgBB](https://imgbb.com/), and then paste the link in the relavant boxes.\n",
+    "\n",
+    "#### In all cases, code your solutions using Python 3. There are three late days available for this assignment. The penalty is 10% per day late.\n",
+    "\n",
+    "---"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Part 1: Probability"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### 1.1 A binary source generates digits 1 and 0 randomly with probabilities 0.6 and 0.4, respectively."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### 1.1.1 What is the probability that two 1s and three 0s will occur in a five-digit sequence?\n",
+    "&nbsp;"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "There are ${5 \\choose 3}$ different permutations of 1s and 0s that have two 1s and three 0s. The probability of each of these permutations occuring is $(0.6)^2*(0.4)^3$. Therefore the total probability is:\n",
+    "${5 \\choose 3} * (0.6)^2 * (0.4)^3 = 10 * (0.02304) = 0.2304$"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### 1.1.2 What is the probability that at least three 1s will occur in a five-digit sequence?\n",
+    "&nbsp;"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "This is equal to:\\\n",
+    "1 - P(no 1s occur) - P(1 occurs once) - P(1 occurs twice) \\\n",
+    "$1 - \\left[{5 \\choose 0}*(0.6)^0*(0.4)^5 \\right]  - \\left[{5 \\choose 1}*(0.6)^1*(0.4)^4 \\right] - \\left[{5 \\choose 2}*(0.6)^2*(0.4)^3 \\right]$ \\\n",
+    "$1 - 0.01024 - 0.0768 - 0.2304 = 0.68256$"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### 1.2 Let $X$, a random variable, be the outcome associated with throwing a fair die.  What is the mean and variance of $X$?\n",
+    "&nbsp;"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "$$\\mu = \\frac{1+2+3+4+5+6}{6} = \\frac{7}{2}$$ \\\n",
+    "$$\\sigma^2 = \\frac{1}{6} \\sum_{i=1}^{6} (i - \\frac{7}{2})^2 = \\frac{1}{6} * [(\\frac{-5}{2})^2 + (\\frac{3}{2})^2 + (\\frac{-1}{2})^2 +(\\frac{1}{2})^2 + (\\frac{3}{2})^2 + (\\frac{5}{2})^2] = \\frac{35}{12} $$"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### 1.3 Let $X$ be a continuous random variable, $X$, with distribution: $f_{X}(x) = kx \\:\\:for \\:\\:0 < x < 1 \\:(and \\:0 \\:otherwise)$.  Find the mean and variance of $X$.\n",
+    "&nbsp;"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The mean of a continuous random variable with distribution $f(x)$ is $\\int_{-\\infty}^{\\infty} xf(x)$ Therefore: \\\n",
+    "$$\\mu = \\int_{0}^{1} (x)(kx) = \\left[ \\frac{kx^3}{3} \\right]_0^1 = \\frac{k}{3}$$ \\\n",
+    "The variance of a continuous random variable with distribution $f(x)$ is $\\int_{-\\infty}^{\\infty}x^2f(x)dx - \\mu^2$ Therefore:\\\n",
+    "$$\\sigma^2 = \\int_0^1(x^2)(kx)dx - (\\frac{k}{3})^2 = \\left[ \\frac{kx^4}{4} \\right]_0^1 - (\\frac{k}{3})^2 = \\frac{k}{4} - (\\frac{k}{3})^2 = \\frac{k}{4} - \\frac{k^2}{9}$$"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### 1.4 The joint distribution of random variables $X$ and $Y$ is: $p_{XY}(x_{i}, y_{j}) = kx_{i}y_{j}$ \tfor $x_{i} = 1, 2,\\, y_{j} = 1, 2, 3\\: and\\, k\\, constant\\, (0 \\,otherwise)$\n",
+    "&nbsp;"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### 1.4.1 Find the value of k.\n",
+    "&nbsp;"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "$$\\sum_{\\forall x,y} p_{XY}(x,y) = 1  $$\n",
+    "$$ \\sum_{x=1}^{2} \\sum_{y=1}^{3}  kxy = 1 $$\n",
+    "$$ k(1+2) (1+2+3) =1 $$\n",
+    "$$ k = \\frac{1}{18} $$"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### 1.4.2 Find the marginal distributions of $X$ and $Y$.\n",
+    "&nbsp;"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "$$p_{X=1} = \\sum_{y=1}^{3}  (\\frac{1}{18})(1)y = \\frac{1}{3}$$\n",
+    "$$p_{X=2} = \\sum_{y=1}^{3}  (\\frac{1}{18})(1)y = \\frac{2}{3}$$\n",
+    "$$p_{Y=1} = \\sum_{x=1}^{2}  (\\frac{1}{18})(1)y = \\frac{1}{6}$$\n",
+    "$$p_{Y=2} = \\sum_{x=1}^{2}  (\\frac{1}{18})(1)y = \\frac{1}{3}$$\n",
+    "$$p_{Y=3} =  \\sum_{x=1}^{2}  (\\frac{1}{18})(1)y = \\frac{1}{2}$$"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### 1.4.3 Are $X$ and $Y$ independent?\n",
+    "&nbsp;"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Yes. Since the joint distribution is simply multiplying $y$ and $x$ together, $P(X=x, Y=y) = P(X=x)*P(Y=y)$, which means it is independent."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### 1.4.4 Find the conditional distributions $p_{Y|X}(y_{j}\\:|\\:x_{i})$ and $p_{X|Y}(x_{i}\\:|\\:y_{j})$\n",
+    "&nbsp;"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Due to independence, $p_{Y|X}(y_{j}\\:|\\:x_{i}) = p_{Y}(y_j)$ and $p_{X|Y}(x_{i}\\:|\\:y_{j}) = p_{X}(x_i)$"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### 1.5 The joint distribution of random variables $X$ and $Y$ is: $p_{XY}(x_{i}, y_{j}) = k(x+y)\\:\\: for \\:\\: 0<x<2,\\:0<y<2,\\:and\\:k\\:constant\\:(0\\:otherwise)$\n",
+    "&nbsp;"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### 1.5.1 Find the value of $k$.\n",
+    "&nbsp;"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "It should sum to 0.\n",
+    "$$\\int_{-\\infty}^{\\infty} \\int_{-\\infty}^{\\infty} f(x,y)dxdy = k\\int_{0}^{2}\\int_{0}^{2} (x+y)dxdy$$\n",
+    "$$=k\\int_{0}^{2}\\left[  \\frac{x^2}{2} + xy\\right]_{0}^{2} dy = k\\int_{0}^{2} [4/2+2y]dy = k\\int_{0}^{2} 2+2ydy$$\n",
+    "$$=k\\left[2y+y^2 \\right]_{0}^{2} = k\\left[4+4\\right] = 8k =1$$\n",
+    "\n",
+    "$$k = \\frac{1}{8}$$"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### 1.5.2 Find the marginal distributions of $X$ and $Y$.\n",
+    "&nbsp;"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "$$ p_{Y}(y) =\\frac{1}{8}\\int_{0}^{2} (x+y)dx = \\frac{1}{8}\\left[  \\frac{x^2}{2} + xy\\right]_{0}^{2} dx = \\frac{1}{8}(2+2y) = \\frac{1}{4}(1+y) $$ \n",
+    "\n",
+    "$$ p_{X}(x) =\\frac{1}{8}\\int_{0}^{2} (x+y)dy = \\frac{1}{8}\\left[  \\frac{y^2}{2} + xy\\right]_{0}^{2} dy = \\frac{1}{8}(2+2x) = \\frac{1}{4}(1+x) $$ "
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### 1.5.3 Are $X$ and $Y$ independent?\n",
+    "&nbsp;"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "No. \n",
+    "P(X) * P(Y)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### 1.5.4 Find the conditional distributions $f_{Y|X}(y_{j}\\,|\\,x_{i})$ and $f_{X|Y}(x_{i}\\,|\\,y_{j})$\n",
+    "&nbsp;"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "$$f_{Y|X}(y_{j}\\,|\\,x_{i}) = \\frac{f_{Y,X}(y_{j}\\,,\\,x_{i})}{f_{X}(x)} = \\frac{\\frac{1}{8}(x+y)}{\\frac{1}{4}(1+x)} = \\frac{(x+y)}{2(1+x)}$$\n",
+    "$$f_{X|Y}(x_{i}\\,|\\,y_{j}) = \\frac{f_{Y,X}(y_{j}\\,,\\,x_{i})}{f_{Y}(y)} = \\frac{\\frac{1}{8}(x+y)}{\\frac{1}{4}(1+y)} = \\frac{(x+y)}{2(1+y)}$$"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### 1.5.5 Find $P(0<Y<\\frac{1}{2}\\:|\\: X = 1)$\n",
+    "&nbsp;"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "$$ \\int_{0}^{1/2} \\frac{(x+y)}{2(1+y)}dy  = \\int_{0}^{1/2} \\frac{(1+y)}{2(1+y)}dy = \\int_{0}^{1/2} \\frac{1}{2} = \\left[\\frac{y}{2} \\right]_{0}^{\\frac{1}{2}} = \\frac{1}{4}$$"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "---\n",
+    "### Part 2: Hidden Markov Models (HMMs)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### In this section you will code the forward, backward, and Viterbi algorithms.  The goal is to understand how these algorithms are used and then benefits of each.  \n",
+    "\n",
+    "#### You have two possible models, model 1 and model 2.  You would like to figure out which model is more likely given the data and you would like to identify the underlying state sequence.  \n",
+    "\n",
+    "#### You have observed the pitch of a speaker.  You decided to bin the pitch into three categories: low (1), medium (2) and high (3). "
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### HMM Model: [link](https://ibb.co/JpXXmxj)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### Your observation vector is Ō = _[1 2 2 1 1 3 3]_."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### Each model is a three state model and the two models have the same transition probabilities (shown in the figure).  You always start in state 1 and end in state 3."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### The observation probabilities are as follows:\n",
+    "| State ||         $\\lambda_{1}$           |||         $\\lambda_{2}$         ||\n",
+    "|:-----:|:----:|:----:|:----:|:----:|:---:|:---:|\n",
+    "|       | high |  med |  low | high | med | low |\n",
+    "|   1   |  0.7 | 0.25 | 0.05 |  0.5 | 0.4 | 0.1 |\n",
+    "|   2   |  0.6 |  0.3 |  0.1 |  0.1 | 0.6 | 0.3 |\n",
+    "|   3   |  0.2 |  0.3 |  0.5 |  0.1 | 0.3 | 0.6 |"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### 2.1 Implement the forward algoirthm:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import numpy as np"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "num_states = 3\n",
+    "num_observations = 7\n",
+    "alphas_1 = np.zeros((num_states, num_observations))\n",
+    "alphas_2 = np.zeros((num_states, num_observations))\n",
+    "transition_probs = np.array([[0.75, 0.25, 0], [0, 0.5, 0.5], [0,0,1]]) #(from_state, to_state)\n",
+    "b_mat1 = np.array([[0.05, 0.25, 0.7], [0.1, 0.3, 0.6], [0.5, 0.3, 0.2]]) #(state, observation)\n",
+    "b_mat2 = np.array([[0.1, 0.4, 0.5], [0.3, 0.6, 0.1], [0.6, 0.3, 0.1]])\n",
+    "observations = np.array([0, 1, 1, 0, 0, 2, 2]) #zero indexing.\n",
+    "initial_state_probs = np.array([1, 0, 0])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 3,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "model 1 1.5030992889404299e-05 model 2 4.1639062500000013e-05\n",
+      "[[5.00000000e-02 0.00000000e+00 0.00000000e+00]\n",
+      " [9.37500000e-03 3.75000000e-03 0.00000000e+00]\n",
+      " [1.75781250e-03 1.26562500e-03 5.62500000e-04]\n",
+      " [6.59179688e-05 1.07226563e-04 5.97656250e-04]\n",
+      " [2.47192383e-06 7.00927734e-06 3.25634766e-04]\n",
+      " [1.29776001e-06 2.47357178e-06 6.58278809e-05]\n",
+      " [6.81324005e-07 9.36735535e-07 1.34129333e-05]]\n",
+      "[[1.00000000e-01 0.00000000e+00 0.00000000e+00]\n",
+      " [3.00000000e-02 1.50000000e-02 0.00000000e+00]\n",
+      " [9.00000000e-03 9.00000000e-03 2.25000000e-03]\n",
+      " [6.75000000e-04 2.02500000e-03 4.05000000e-03]\n",
+      " [5.06250000e-05 3.54375000e-04 3.03750000e-03]\n",
+      " [1.89843750e-05 1.89843750e-05 3.21468750e-04]\n",
+      " [7.11914063e-06 1.42382813e-06 3.30960938e-05]]\n"
+     ]
+    }
+   ],
+   "source": [
+    "#initialization\n",
+    "for i in range(num_states):\n",
+    "    alphas_1[i,0] = b_mat1[i, observations[0]] * initial_state_probs[i]\n",
+    "    alphas_2[i,0] = b_mat2[i, observations[0]] * initial_state_probs[i]\n",
+    "\n",
+    "#main forward algorithm\n",
+    "for obs_idx in range(1, num_observations):\n",
+    "    for to_state in range(num_states):\n",
+    "        sum_1 = sum_2 = 0\n",
+    "        for from_state in range(num_states):\n",
+    "            sum_1 += alphas_1[from_state, obs_idx-1]*transition_probs[from_state, to_state]\n",
+    "            sum_2 += alphas_2[from_state, obs_idx-1]*transition_probs[from_state, to_state]\n",
+    "        alphas_1[to_state, obs_idx] = sum_1 * b_mat1[to_state, observations[obs_idx]]\n",
+    "        alphas_2[to_state, obs_idx] = sum_2 * b_mat2[to_state, observations[obs_idx]]\n",
+    "\n",
+    "#termination\n",
+    "model_1 = 0\n",
+    "model_2 = 0\n",
+    "for state in range(num_states):\n",
+    "    model_1 += alphas_1[state, num_observations-1]\n",
+    "    model_2 += alphas_2[state, num_observations-1]\n",
+    "print(\"model 1\", model_1, \"model 2\", model_2)\n",
+    "print(alphas_1.transpose())\n",
+    "print(alphas_2.transpose())"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### 2.1.1 Calculate $\\alpha_{1}$ to $\\alpha_{3}$ by hand.\n",
+    "&nbsp;"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "| State ||         $\\lambda_{1}$           |||         $\\lambda_{2}$         ||\n",
+    "|:-----:|:----:|:----:|:----:|:----:|:---:|:---:|\n",
+    "|       | $\\alpha_1$ |  $\\alpha_2$ |   $\\alpha_3$ |  $\\alpha_1$ |  $\\alpha_2$ |  $\\alpha_3$ |\n",
+    "|   1   |  0.05 | 0.009375 | 0.00175781 |  0.1 | 0.03 | 0.009 |\n",
+    "|   2   |  0.0 |  0.00375 |  0.00126563 |  0.0 | 0.015 | 0.009 |\n",
+    "|   3   |  0.0 |  0.0 |  0.0005625  |  0.0 | 0.0 | 0.00225 |"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### 2.1.2 What is $P(Ō \\,|\\,\\lambda_{i})$ for each model?\n",
+    "&nbsp;"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "$P(\\bar{O} | \\lambda_{1}) = 1.5030992889404299*10^{-05}$ \\\n",
+    "$P(\\bar{O} | \\lambda_{2}) = 4.1639062500000013*10^{-05}$"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### 2.1.3 Which model most likely produced the observation?\n",
+    "&nbsp;"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Model 2."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### 2.2 Implement the backward algoirthm:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 74,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[[3.00619858e-04 8.06625000e-04 9.00000000e-04]\n",
+      " [6.52305908e-04 2.37750000e-03 3.00000000e-03]\n",
+      " [1.13896484e-03 5.85000000e-03 1.00000000e-02]\n",
+      " [1.90390625e-02 1.70000000e-02 2.00000000e-02]\n",
+      " [4.14375000e-01 1.40000000e-01 4.00000000e-02]\n",
+      " [6.75000000e-01 4.00000000e-01 2.00000000e-01]\n",
+      " [1.00000000e+00 1.00000000e+00 1.00000000e+00]]\n",
+      "[[4.16390625e-04 5.46750000e-04 3.24000000e-04]\n",
+      " [7.46718750e-04 1.28250000e-03 1.08000000e-03]\n",
+      " [1.25156250e-03 2.47500000e-03 3.60000000e-03]\n",
+      " [1.21875000e-02 4.50000000e-03 6.00000000e-03]\n",
+      " [1.52500000e-01 1.00000000e-02 1.00000000e-02]\n",
+      " [4.00000000e-01 1.00000000e-01 1.00000000e-01]\n",
+      " [1.00000000e+00 1.00000000e+00 1.00000000e+00]]\n",
+      "1.5030992889404297e-05 4.1639062500000013e-05\n"
+     ]
+    }
+   ],
+   "source": [
+    "betas_1 = np.zeros((num_states, num_observations))\n",
+    "betas_2 = np.zeros((num_states, num_observations))\n",
+    "\n",
+    "#initialization:\n",
+    "for i in range(num_states):\n",
+    "    betas_1[i, num_observations-1] = 1\n",
+    "    betas_2[i, num_observations-1] = 1\n",
+    "\n",
+    "#main backward algorithm:\n",
+    "for obs_idx in reversed(range(num_observations-1)):\n",
+    "    for from_state in range(num_states):\n",
+    "        sum_1 = 0\n",
+    "        sum_2 = 0\n",
+    "        for to_state in range(num_states):\n",
+    "            sum_1 += transition_probs[from_state, to_state]*b_mat1[to_state, \\\n",
+    "                                                                   observations[obs_idx+1]]*betas_1[to_state, obs_idx+1]\n",
+    "            sum_2 += transition_probs[from_state, to_state]*b_mat2[to_state, \\\n",
+    "                                                                   observations[obs_idx+1]]*betas_2[to_state, obs_idx+1]\n",
+    "        betas_1[from_state, obs_idx] = sum_1\n",
+    "        betas_2[from_state, obs_idx] = sum_2\n",
+    "\n",
+    "print(betas_1.transpose())\n",
+    "print(betas_2.transpose())\n",
+    "#termination\n",
+    "model1 = model2 = 0\n",
+    "for state in range(num_states):\n",
+    "    model1+= initial_state_probs[state] * b_mat1[state, 0] * betas_1[state, 0]\n",
+    "    model2+= initial_state_probs[state] * b_mat2[state, 0] * betas_2[state, 0]\n",
+    "print(model1, model2)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### 2.2.1 Calculate $\\beta_{1}$ to $\\beta_{3}$ by hand.\n",
+    "&nbsp;"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "| State ||         $\\lambda_{1}$           |||         $\\lambda_{2}$         ||\n",
+    "|:-----:|:----:|:----:|:----:|:----:|:---:|:---:|\n",
+    "|       | $\\beta_1$ |  $\\beta_2$ |   $\\beta_3$ |  $\\beta_1$ |  $\\beta_2$ |  $\\beta_3$ |\n",
+    "|   1   |  0.00030062 | 0.00065231 | 0.00113896 |  0.00041639 | 0.00074672 | 0.00125156 |\n",
+    "|   2   |  0.00080663 |  0.0023775 |  0.00585 |  0.00054675 | 0.0012825 | 0.002475 |\n",
+    "|   3   |  0.0009 |  0.003 |  0.01  |  0.000324 | 0.00108 | 0.0036 |"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### 2.2.2 What is $P(Ō \\,|\\,\\lambda_{i})$ for each model?\n",
+    "&nbsp;"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "$P(\\bar{O} | \\lambda_{1}) = 1.5030992889404299*10^{-05}$ \\\n",
+    "$P(\\bar{O} | \\lambda_{2}) = 4.1639062500000013*10^{-05}$"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### 2.2.3 Which model most likely produced the observation?\n",
+    "&nbsp;"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Model 2"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### 2.2.4 Are the probabilities for the forward and backward algorithm the same or different? Why?\n",
+    "&nbsp;"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The same. Each algorithm is just using different ways to calculate the probability of the given observation sequence given each model. The end result is the same."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### 2.3 Now, implement local recognition to find the most likely state sequence"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 5,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "state sequence for model 1: (zero indexed) [0 1 1 2 2 2 2]\n",
+      "state sequence for model 2: (zero indexed) [0 0 1 2 2 2 2]\n",
+      "[[1.         0.         0.        ]\n",
+      " [0.40685056 0.59314944 0.        ]\n",
+      " [0.13319723 0.49257599 0.37422678]\n",
+      " [0.08349524 0.12127286 0.7952319 ]\n",
+      " [0.06814609 0.06528503 0.86656888]\n",
+      " [0.05827879 0.06582591 0.87589531]\n",
+      " [0.04532794 0.06232027 0.89235179]]\n",
+      "[[1.         0.         0.        ]\n",
+      " [0.53799392 0.46200608 0.        ]\n",
+      " [0.27051672 0.53495441 0.19452888]\n",
+      " [0.19756839 0.21884498 0.58358663]\n",
+      " [0.18541033 0.08510638 0.72948328]\n",
+      " [0.18237082 0.04559271 0.77203647]\n",
+      " [0.17097264 0.03419453 0.79483283]]\n",
+      "[[5.00000000e-02 9.37500000e-03 1.75781250e-03 6.59179688e-05\n",
+      "  2.47192383e-06 1.29776001e-06 6.81324005e-07]\n",
+      " [0.00000000e+00 3.75000000e-03 1.26562500e-03 1.07226563e-04\n",
+      "  7.00927734e-06 2.47357178e-06 9.36735535e-07]\n",
+      " [0.00000000e+00 0.00000000e+00 5.62500000e-04 5.97656250e-04\n",
+      "  3.25634766e-04 6.58278809e-05 1.34129333e-05]]\n",
+      "[[3.00619858e-04 6.52305908e-04 1.13896484e-03 1.90390625e-02\n",
+      "  4.14375000e-01 6.75000000e-01 1.00000000e+00]\n",
+      " [8.06625000e-04 2.37750000e-03 5.85000000e-03 1.70000000e-02\n",
+      "  1.40000000e-01 4.00000000e-01 1.00000000e+00]\n",
+      " [9.00000000e-04 3.00000000e-03 1.00000000e-02 2.00000000e-02\n",
+      "  4.00000000e-02 2.00000000e-01 1.00000000e+00]]\n"
+     ]
+    }
+   ],
+   "source": [
+    "gammas_1 = np.zeros((num_states, num_observations))\n",
+    "gammas_2 = np.zeros((num_states, num_observations))\n",
+    "for obs_idx in range(num_observations):\n",
+    "    denom1 = 0\n",
+    "    denom2 = 0\n",
+    "    for state_i in range(num_states):\n",
+    "        denom1 += alphas_1[state_i, obs_idx] * betas_1[state_i, obs_idx]\n",
+    "        denom2 += alphas_2[state_i, obs_idx] * betas_2[state_i, obs_idx]\n",
+    "    for state_j in range(num_states):\n",
+    "        num1 = alphas_1[state_j, obs_idx] * betas_1[state_j, obs_idx]\n",
+    "        num2 = alphas_2[state_j, obs_idx] * betas_2[state_j, obs_idx]\n",
+    "        gammas_1[state_j, obs_idx] = num1/denom1\n",
+    "        gammas_2[state_j, obs_idx] = num2/denom2\n",
+    "\n",
+    "print(\"state sequence for model 1: (zero indexed)\",np.argmax(gammas_1, axis=0))\n",
+    "print(\"state sequence for model 2: (zero indexed)\",np.argmax(gammas_2, axis=0))\n",
+    "\n",
+    "print(gammas_1.transpose())\n",
+    "print(gammas_2.transpose())\n",
+    "\n",
+    "print(alphas_1)\n",
+    "print(betas_1)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### 2.3.1\tWhat is the state sequence associated with each model?\n",
+    "&nbsp;"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Model 1: [0 1 1 2 2 2 2] \\\n",
+    "Model 2: [0 0 1 2 2 2 2]"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### 2.3.2 What is the problem with using local recognition?\n",
+    "&nbsp;"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The state sequence it spits out may not be valid - it may specify a state transition that is impossible."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### 2.4 Finally, implement the Viterbi algorithm and identify the most likely state sequence for each model."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 6,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Model 1\n",
+      "5.625e-06\n",
+      "[0 1 2 2 2 2 2]\n",
+      "\n",
+      "Model 2\n",
+      "8.100000000000002e-06\n",
+      "[0 0 1 2 2 2 2]\n"
+     ]
+    }
+   ],
+   "source": [
+    "psi1 = np.full((num_states, num_observations), np.NAN)\n",
+    "psi2 = np.full((num_states, num_observations), np.NAN)\n",
+    "s1 = np.full((num_states, num_observations), np.NAN)\n",
+    "s2 = np.full((num_states, num_observations), np.NAN)\n",
+    "q_star_1 = np.zeros(num_observations, dtype=np.int)\n",
+    "q_star_2 = np.zeros(num_observations, dtype= np.int)\n",
+    "\n",
+    "#initialization\n",
+    "for state in range(num_states):\n",
+    "    s1[state, 0] = initial_state_probs[state] * b_mat1[state, observations[0]]\n",
+    "    s2[state, 0] = initial_state_probs[state] * b_mat2[state, observations[0]]\n",
+    "    psi1[state, 0] = np.NAN\n",
+    "    psi2[state, 0] = np.NAN\n",
+    "\n",
+    "\n",
+    "#recursion\n",
+    "for obs_idx in range(1, num_observations):\n",
+    "    for to_state in range(num_states):\n",
+    "        possibilities1 = np.zeros(num_states)\n",
+    "        possibilities2 = np.zeros(num_states)\n",
+    "        for from_state in range(num_states):\n",
+    "            possibilities1[from_state] =s1[from_state, obs_idx-1] *transition_probs[from_state, to_state]\n",
+    "            possibilities2[from_state] = s2[from_state, obs_idx-1] * transition_probs[from_state, to_state]\n",
+    "        \n",
+    "        s1[to_state, obs_idx] = np.max(possibilities1)*b_mat1[to_state, observations[obs_idx]]\n",
+    "        psi1[to_state, obs_idx] = np.argmax(possibilities1)\n",
+    "        s2[to_state, obs_idx] = np.max(possibilities2)*b_mat2[to_state, observations[obs_idx]]\n",
+    "        psi2[to_state, obs_idx] = np.argmax(possibilities2)\n",
+    "\n",
+    "#termination\n",
+    "p_star_1 = np.max(s1[:, num_observations-1])\n",
+    "q_star_1[num_observations-1] = np.argmax(s1[:, num_observations-1])\n",
+    "p_star_2 = np.max(s2[:, num_observations-1])\n",
+    "q_star_2[num_observations-1] = np.argmax(s2[:, num_observations-1])\n",
+    "\n",
+    "#backtracking\n",
+    "for obs_idx in reversed(range(num_observations-1)):\n",
+    "    q_star_1[obs_idx] = psi1[q_star_1[obs_idx+1], obs_idx+1]\n",
+    "    q_star_2[obs_idx] = psi2[q_star_2[obs_idx+1], obs_idx+1]\n",
+    "\n",
+    "print(\"Model 1\")\n",
+    "print(p_star_1)\n",
+    "print(q_star_1)\n",
+    "print(\"\\nModel 2\")\n",
+    "print(p_star_2)\n",
+    "print(q_star_2)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Model 1 outputs the sequence: [0 1 2 2 2 2 2] \\\n",
+    "Model 2 outputs the sequence: [0 0 1 2 2 2 2] \\\n",
+    "Model 1 is the more more probable model."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "___\n",
+    "### Part 3: Spoken Calculator\n",
+    "#### In this part of the assignment, we will learn how to use python packages to train a HMM model to recognize spoken digits.  We will then use the trained HMM to recognize digits in an equation which would serve as a calculator. We would be using the dataset published by google: [Speech Commands Dataset](http://ai.googleblog.com/2017/08/launching-speech-commands-dataset.html).\n",
+    "\n",
+    "#### For the purpose of this assignment, we will use the spoken calculator as follows:\n",
+    "#### `1+1` is spoken as `one plus one`\n",
+    "#### `999 - 213` is spoken as `nine nine nine minus two one three`\n",
+    "\n",
+    "#### We will concentrate on `plus` and `minus` operations for this assignment. For collecting voice data about operands, we suggest recording yourself saying these two words multiple times. We will also upload some recordings to the HW2 folder on canvas. You can also share these recordings amongst the class."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### 3.1 Import all packages"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 7,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import os\n",
+    "import pandas as pd\n",
+    "from pathlib import Path\n",
+    "import python_speech_features as psf\n",
+    "import pydub.silence\n",
+    "import pydub.generators\n",
+    "import numpy as np\n",
+    "from hmmlearn import hmm"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### 3.2 Prepare the dataset\n",
+    "#### _Prepare a dataframe where` column A` refers to the `file path` of the wav file and `column B` refers to the `spoken digit` or the `operator`._"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 8,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "folders = os.listdir('./digits/digits')\n",
+    "\n",
+    "df = pd.DataFrame(columns=['filepath','word'])\n",
+    "for folder in folders:\n",
+    "    if folder[0] is not '.':\n",
+    "        digit_folder = './digits/digits/'+folder+'/'\n",
+    "        files = os.listdir(digit_folder)\n",
+    "        df = df.append([{'word':folder, 'filepath':digit_folder+file} for file in files], ignore_index=True)\n",
+    "\n",
+    "folders = os.listdir('./plus_minus/plus_minus/')\n",
+    "for file in folders:\n",
+    "    filepath = './plus_minus/plus_minus/'+file\n",
+    "    if file[:5] == 'minus':\n",
+    "        label = 'minus'\n",
+    "        df = df.append({'word': label, 'filepath': filepath}, ignore_index=True)\n",
+    "    elif file[:4] == 'plus':\n",
+    "        label = 'plus'\n",
+    "        df= df.append({'word': label, 'filepath': filepath}, ignore_index=True)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### 3.3 Write a function to extract MFBs from the given wav file using `logfbank` from `python_speech_features`. Make sure that you trim any silence using `detect_leading_silence` function from `pydub`.\n",
+    "\n",
+    "#### _We will use this function to return the MFBs of any wav file that has a `singular spoken digit` in it._"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 9,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "def detect_leading_silence(sound, silence_threshold=-50.0, chunk_size=10):\n",
+    "    '''\n",
+    "    sound is a pydub.AudioSegment\n",
+    "    silence_threshold in dB\n",
+    "    chunk_size in ms\n",
+    "    iterate over chunks until you find the first one with sound\n",
+    "    '''\n",
+    "    trim_ms = 0 # ms\n",
+    "    assert chunk_size > 0 # to avoid infinite loop\n",
+    "    while sound[trim_ms:trim_ms+chunk_size].dBFS < silence_threshold and trim_ms < len(sound):\n",
+    "        trim_ms += chunk_size\n",
+    "\n",
+    "    return trim_ms\n",
+    "\n",
+    "def detect_leading_silence_filepath(filepath):\n",
+    "    sound = pydub.AudioSegment.from_file(filepath, format=\"wav\")\n",
+    "    return detect_leading_silence(sound)\n",
+    "\n",
+    "def length_of_file(filepath):\n",
+    "    sound = pydub.AudioSegment.from_file(filepath, format=\"wav\")\n",
+    "    return(len(sound))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 32,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "def extract_mfcc(filepath):\n",
+    "    sound = pydub.AudioSegment.from_file(filepath, format=\"wav\")\n",
+    "    chunk_size = 10\n",
+    "    first_noisy_idx = int(detect_leading_silence(sound, chunk_size=chunk_size))\n",
+    "    sound = sound[first_noisy_idx:]\n",
+    "    return psf.mfcc(np.array(sound.get_array_of_samples()))\n",
+    "\n",
+    "def extract_mfcc_from_AudioSegment(sound):\n",
+    "    chunk_size = 10\n",
+    "    first_noisy_idx = int(detect_leading_silence(sound, chunk_size=chunk_size))\n",
+    "    sound = sound[first_noisy_idx:]\n",
+    "    return psf.mfcc(np.array(sound.get_array_of_samples()))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### 3.4 Build the dataset where you extract MFBs using the function from `3.3` to get a form a paired sample of the set of MFBs and the labelled spoken digit or operator."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 11,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "drop_idxs = df[df['filepath'].apply(detect_leading_silence_filepath) >= df['filepath'].apply(length_of_file)-1].index\n",
+    "df = df.drop(drop_idxs)\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 12,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "mfcc_df = pd.DataFrame({'label':df['word'], 'mfcc':df['filepath'].apply(extract_mfcc)})"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### 3.5 Divide your dataset into `test` and `train` such that you have samples for each label in both the partitions, and these are speaker independent. For your help, the test files have been mentioned in the uploaded `testing_list.txt`. You can assume all other files are part of training. For more information on how to create these sets, look at `Readme.md` in the [Speech Commands Dataset](http://ai.googleblog.com/2017/08/launching-speech-commands-dataset.html)."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 13,
+   "metadata": {
+    "scrolled": true
+   },
+   "outputs": [],
+   "source": [
+    "with open(\"testing_list.txt\", 'r') as f:\n",
+    "    x = f.readlines()\n",
+    "x = [\"./digits/digits/\"+bleh.strip() for bleh in x]\n",
+    "x.extend(['./plus_minus/plus_minus/' + _ for _ in ['minus6.wav', 'minus7.wav', 'plus3.wav', 'plus5.wav']])\n",
+    "w = [_ for _ in x if _ in df['filepath'].tolist()]\n",
+    "indices = [df.loc[df['filepath'] == bleh].index[0] for bleh in w]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 14,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "test_df = mfcc_df.loc[indices].reset_index(drop=True)\n",
+    "train_df = mfcc_df.drop(indices).reset_index(drop=True)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### 3.6 Write a function that trains and returns a Gaussian Mixture Model HMM (`GMMHMM`) with number of components set to `n_comp=15` using the features extracted from samples for each digit or operator. Use `monitor_.converged` parameter of the model to check for convergence (because EM is gradient-based optimization method, it may get stuck in local optima, or not converge). Pass an argument `mat` to the function that would define if the GMMHMM uses `diag` covariance matrix (no correlations) or `full` covariance matrix. Set the `covariance_type` parameter in the defined GMMHMM to the `value of mat`.\n",
+    "\n",
+    "#### _Refer to the documentation on `hmmlearn` to write this function. You would be calling this function to train and store a different model for each digit and both the operators._"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 15,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "def train_gmmhmm(features, lengths, mat):\n",
+    "    model = hmm.GaussianHMM(n_components=13, covariance_type=mat)\n",
+    "    while not model.monitor_.converged:\n",
+    "        model.fit(features, lengths)\n",
+    "    return model"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### 3.7 Use the function from `3.4` to obtain trained HMMs with `mat` set to `diag` for each label using the corresponding samples from the `train set` and store it in a dictionary. \n",
+    "\n",
+    "#### In total, you should have 12 HMMs, one each for the `digits 0-9`, and one each for `plus` and `minus`."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 16,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "['eight' 'five' 'four' 'nine' 'one' 'seven' 'six' 'three' 'two' 'zero'\n",
+      " 'minus' 'plus']\n"
+     ]
+    }
+   ],
+   "source": [
+    "labels = train_df['label'].unique()\n",
+    "print(labels)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 17,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "train_arrays_stacked = {}\n",
+    "train_arrays_lengths = {}\n",
+    "for label in labels:\n",
+    "    series = train_df.loc[train_df['label'] == label]['mfcc'].reset_index(drop=True)\n",
+    "    stack_array = np.array(series[0])\n",
+    "    train_arrays_lengths[label] = [stack_array.shape[0]]\n",
+    "    for index, mfcc in series[:].iteritems():\n",
+    "        if index != 0:\n",
+    "            stack_array = np.vstack((stack_array, mfcc))\n",
+    "            train_arrays_lengths[label].append(mfcc.shape[0])\n",
+    "    train_arrays_stacked[label] = stack_array"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 18,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "12\n"
+     ]
+    }
+   ],
+   "source": [
+    "diag_models = {}\n",
+    "for label in labels:\n",
+    "    model = train_gmmhmm(train_arrays_stacked[label], train_arrays_lengths[label], 'diag')\n",
+    "    diag_models[label] = model\n",
+    "print(len(diag_models))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### 3.8 Predict the labels for the samples from the `test set`. You are suggested to write a function for this.\n",
+    "\n",
+    "#### _To do this, use the `score` function for each stored model to obtain the log probability under the model for that sample. To calculate accuracy, find which model obtained the maximum score, and assign the sample that label._"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 19,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "def predict_labels(models, lengths, data):\n",
+    "    scores = pd.DataFrame(columns=labels)\n",
+    "    scoresdict ={}\n",
+    "    iterator = 0\n",
+    "    for length in lengths:\n",
+    "        sample = data[iterator: iterator+length]\n",
+    "        iterator+=length\n",
+    "        for label,model in models.items():\n",
+    "            scoresdict[label] = model.score(sample)\n",
+    "        scores= scores.append(scoresdict, ignore_index=True)\n",
+    "    prediction = scores.idxmax(axis=1) #argmax\n",
+    "    return prediction\n",
+    "\n",
+    "def predict_labels_from_df(models, test_df): # does the np.vstack stuff.\n",
+    "    test_arrays_stacked = {}\n",
+    "    test_arrays_lengths = {}\n",
+    "\n",
+    "    series = test_df['mfcc'].reset_index(drop=True)\n",
+    "    stack_array = np.array(series[0])\n",
+    "    test_arrays_lengths = [stack_array.shape[0]]\n",
+    "    for index, mfcc in series[:].iteritems():\n",
+    "        if index != 0:\n",
+    "            stack_array = np.vstack((stack_array, mfcc))\n",
+    "            test_arrays_lengths.append(mfcc.shape[0])\n",
+    "    test_arrays_stacked = stack_array\n",
+    "    prediction = predict_labels(models, test_arrays_lengths, test_arrays_stacked)\n",
+    "    return prediction"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### 3.9 What is the unweighted accuracy of the trained models when using `diag covariance` parameters??"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 20,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "prediction = predict_labels_from_df(diag_models,test_df)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 21,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "0.7478504299140172\n"
+     ]
+    }
+   ],
+   "source": [
+    "accuracy = ((prediction == test_df['label'][:])).sum() / prediction.shape[0]\n",
+    "print(accuracy)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### 3.10 Use the function from `3.4` to obtain trained HMMs with `mat` set to `full` for each label using the corresponding samples from the `train set` and store it in a dictionary. \n",
+    "\n",
+    "#### In total, you should have 12 HMMs, one each for the `digits 0-9`, and one each for `plus` and `minus`."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 22,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "full model for eight  trained\n",
+      "full model for five  trained\n",
+      "full model for four  trained\n",
+      "full model for nine  trained\n",
+      "full model for one  trained\n",
+      "full model for seven  trained\n",
+      "full model for six  trained\n",
+      "full model for three  trained\n",
+      "full model for two  trained\n",
+      "full model for zero  trained\n",
+      "full model for minus  trained\n",
+      "full model for plus  trained\n"
+     ]
+    }
+   ],
+   "source": [
+    "full_models = {}\n",
+    "for label in labels:\n",
+    "    model = train_gmmhmm(train_arrays_stacked[label], train_arrays_lengths[label], 'diag')\n",
+    "    full_models[label] = model\n",
+    "    print(\"full model for\",label,\" trained\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 23,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "12\n"
+     ]
+    }
+   ],
+   "source": [
+    "print(len(full_models))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### 3.11 What is the unweighted accuracy of the trained models when using `full covariance` parameters?"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 24,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "prediction = predict_labels_from_df(full_models, test_df)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 25,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "accuracy = ((prediction == test_df['label'][:])).sum() / prediction.shape[0]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 26,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "0.7484503099380124"
+      ]
+     },
+     "execution_count": 26,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "accuracy"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "---\n",
+    "#### Now we have a spoken digit recognizer. Let's get onto making a spoken calculator.\n",
+    "\n",
+    "#### 3.12 Write a function that splits the given audio file by silences.\n",
+    "\n",
+    "#### _You can possibly look into `pydub` to accomplish this. Use parameters: `min_silence_len=100,silence_thresh=-25, keep_silence=50` to get the best individual segments Save the segments. on your system to be used in future._"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 27,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "def audio_splitter(filepath): #\n",
+    "    clip = pydub.AudioSegment.from_file(filepath, format=\"wav\")\n",
+    "    split_clips = pydub.silence.split_on_silence(clip, min_silence_len=100,silence_thresh=-40, keep_silence=50)\n",
+    "    return split_clips\n",
+    "\n",
+    "def audio_splitter_from_AudioSegment(clip, silence_threshold=-40): #\n",
+    "    split_clips = pydub.silence.split_on_silence(clip, min_silence_len=100,silence_thresh=-40, keep_silence=50)\n",
+    "    return split_clips"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### 3.13 Write a function that would use the function from `3.3` to extract features for these individual segments, and merge the outputs to form a string."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 28,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "def split_then_mffc_clip(filepath): # split recording with multiple digits and then get mfccs for each digit.\n",
+    "    split_clips = audio_splitter(filepath)\n",
+    "    total_mfccs = []\n",
+    "    for clip in split_clips:\n",
+    "        total_mfccs.append(extract_mfcc_from_AudioSegment(clip))\n",
+    "    return total_mfccs   \n",
+    "\n",
+    "def split_then_mffc_clip_from_AudioSegment(file, silence_threshold=-40): # split recording with multiple digits and then get mfccs for each digit.\n",
+    "    split_clips = audio_splitter_from_AudioSegment(file, silence_threshold)\n",
+    "    total_mfccs = []\n",
+    "    for clip in split_clips:\n",
+    "        total_mfccs.append(extract_mfcc_from_AudioSegment(clip))\n",
+    "    return total_mfccs "
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### 3.14 Load 10 wav files for spoken calculation strings. (recorded by yourself or others -- feel free to share these files to find how well your model does for varying recordings)  \n",
+    "\n",
+    "#### _Remember to label these with both the calculation and the string corresponding to the spoken calculation. For example, for a wave file recorded saying `nine nine plus two zero`, have labels saying, `99+20` and `119` . Assume that all input files would be in this format._"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 29,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "symbol_to_label = {'0':'zero', '1':'one', '2':'two', '3':'three', '4':'four', '5':'five', '6':'six', '7':'seven', '8':'eight', '9':'nine', '+':'plus', '-':'minus'}\n",
+    "label_to_symbol = {'zero':'0', 'one':'1', 'two': '2', 'three':'3', 'four':'4', 'five':'5', 'six':'6', 'seven':'7', 'eight':'8', 'nine':'9', 'plus':'+', 'minus':'-'}\n",
+    "def calc_filename_to_labels(filename):\n",
+    "    labels = []\n",
+    "    for character in filename:\n",
+    "        labels.append(symbol_to_label[character])\n",
+    "    return labels"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 33,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "files = os.listdir('./calc_recordings/')\n",
+    "calc_df = pd.DataFrame(columns=['labels', 'mfcc'])\n",
+    "for file in files:\n",
+    "    if file[-4:]=='.wav':\n",
+    "        filepath = './calc_recordings/'+file\n",
+    "        mfcc = split_then_mffc_clip(filepath)\n",
+    "        name = file[:-4]\n",
+    "        calc_df = calc_df.append({'labels': calc_filename_to_labels(name), 'mfcc': mfcc}, ignore_index=True)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### 3.15 For each wav file, split it using the function defined in `3.10` and then subsequently obtain the spoken string using function defined in `3.11`. Use the `eval` function to calculate the output."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 34,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "def pred_labels_calculator(mfccs): # try to label calculator recordings I made eg \"13+32\"\n",
+    "    predictions_all = []\n",
+    "    for index, recording in mfccs.iteritems():\n",
+    "        recording_stacked = np.array(recording[0])\n",
+    "        lengths = [len(recording_stacked)]\n",
+    "        for mfcc in recording[1:]:\n",
+    "            recording_stacked = np.vstack((recording_stacked, mfcc))\n",
+    "            lengths.append(len(mfcc))\n",
+    "        predictions = predict_labels(full_models, lengths, recording_stacked).tolist()\n",
+    "        predictions_all.append(predictions) \n",
+    "    return predictions_all\n",
+    "\n",
+    "def predictions_to_evaluations(predictions_all): #evaluate against calculator recordings I made eg \"13+32\"\n",
+    "    calc_out_pred=[]\n",
+    "    for predictions in predictions_all:\n",
+    "        spoken_string = ''\n",
+    "        for prediction in predictions:\n",
+    "            spoken_string += (label_to_symbol[prediction])\n",
+    "\n",
+    "        try:\n",
+    "            output = eval(spoken_string)\n",
+    "            calc_out_pred.append(output)\n",
+    "        except SyntaxError:\n",
+    "            calc_out_pred.append(False)\n",
+    "    return(calc_out_pred)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 35,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "predictions_all = pred_labels_calculator(calc_df['mfcc'])\n",
+    "calc_out_pred = predictions_to_evaluations(predictions_all)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### 3.16 What is the average character compared accuracy for the spoken strings i.e. if you get 3 out of 4 characters right, the `per-char-acc` for that wave file is 75%. Calculate the average accuracy across all spoken string samples. You are suggested to write a function to do this for each string."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 36,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "def per_char_acc(pred_list, actual_list):\n",
+    "    #input eg: ['nine', 'plus', 'eight']\n",
+    "    if len(pred_list) != len(actual_list):\n",
+    "        return 0\n",
+    "    correct = 0\n",
+    "    for i in range(len(pred_list)):\n",
+    "        correct += predictions[i] == actual_list[i]\n",
+    "    acc = correct/len(pred_list)\n",
+    "    return acc"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 37,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "per-char-acc: 0.04\n"
+     ]
+    }
+   ],
+   "source": [
+    "idx = 0\n",
+    "accuracies =[]\n",
+    "for predictions in predictions_all:\n",
+    "    accuracies.append(per_char_acc(predictions, calc_df['labels'][idx]))\n",
+    "print(\"per-char-acc:\", sum(accuracies)/len(accuracies))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### 3.17 What is the calculation output accuracy for the spoken strings i.e. if you get 4 out of 8 calculations right, the `calc-out-acc` for all your inputs is 50%. You are suggested to write a function to do this for each string."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 38,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "idx = 0\n",
+    "correct_calc = []\n",
+    "calc_out_actual = []\n",
+    "\n",
+    "for name in calc_df['labels']:\n",
+    "    spoken_string = ''\n",
+    "    for character in name:\n",
+    "        spoken_string += (label_to_symbol[character])\n",
+    "    calc_out_actual.append(eval(spoken_string))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 39,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "81-83\n"
+     ]
+    }
+   ],
+   "source": [
+    "print(spoken_string)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 40,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "calc-out-acc: 0.0\n"
+     ]
+    }
+   ],
+   "source": [
+    "correct = 0\n",
+    "for i in range(len(calc_out_actual)):\n",
+    "    if not calc_out_pred[i]:\n",
+    "        continue\n",
+    "    correct += calc_out_actual[i] == calc_out_pred[i]\n",
+    "print(\"calc-out-acc:\", sum(correct_calc)/len(calc_out_actual))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### Testing this calculator\n",
+    "\n",
+    "#### 3.18 We have uptil now considered clean data. Both the digits and the operands were recorded in a minimal noise environment. What happens when we have noise in our test files? (Someone tries to use this calculator at a bus stop).\n",
+    "\n",
+    "#### Let's start with creating artifical noise. We will pollute just the test samples of each digit and operator with noise. Use the `WhiteNoise` from `pydub.generators` and `overlay` it over the original wave files to get noisy samples. How well does the already trained HMM perform (Use functions from `3.8`)?"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 60,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "def get_noisy_mfcc_from_filepath(filepath): # put white noise on recording, then get mfccs.\n",
+    "    sound = pydub.AudioSegment.from_file(filepath, format=\"wav\")\n",
+    "    noisy= pydub.generators.WhiteNoise().to_audio_segment(duration=len(sound))\n",
+    "    noisy = noisy-40\n",
+    "    combined = sound.overlay(noisy)\n",
+    "    chunk_size = 10\n",
+    "    first_noisy_idx = int(detect_leading_silence(sound,chunk_size=chunk_size))\n",
+    "    combined = combined[first_noisy_idx:]\n",
+    "    return psf.mfcc(np.array(combined.get_array_of_samples()))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 61,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "noisy_test_df = df.loc[indices]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 62,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "noisy_test_df['mfcc'] = df['filepath'].apply(get_noisy_mfcc_from_filepath)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 63,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "noisy_test_df = noisy_test_df.reset_index()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 64,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "prediction = predict_labels_from_df(full_models, noisy_test_df)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 65,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "0.04599080183963208"
+      ]
+     },
+     "execution_count": 65,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "accuracy = ((prediction == noisy_test_df['word'])).sum()/prediction.shape[0]\n",
+    "accuracy"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### 3.19 Load your test wave files for string calculation again. Pollute the complete spoken calculation string wave files with white noise. How well does the already trained HMM perform on these string calculations (Use functions from `3.14` and `3.15`)?"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 66,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "def split_then_get_noisy_mfcc_from_filepath(filepath): #used when multiple digits are in the recording\n",
+    "    split_clips = audio_splitter(filepath)\n",
+    "    total_mfccs = []\n",
+    "    for clip in split_clips:\n",
+    "        total_mfccs.append(get_noisy_mfcc_from_AudioSegment(clip))\n",
+    "    return total_mfccs \n",
+    "\n",
+    "def get_noisy_mfcc_from_AudioSegment(sound): #used when a single digit is in the recording\n",
+    "    noisy= pydub.generators.WhiteNoise().to_audio_segment(duration=len(sound))\n",
+    "    noisy = noisy-40\n",
+    "    combined = sound.overlay(noisy)\n",
+    "    chunk_size = 10\n",
+    "    first_noisy_idx = int(detect_leading_silence(sound, chunk_size=chunk_size))\n",
+    "    combined = combined[first_noisy_idx:]\n",
+    "    return psf.mfcc(np.array(combined.get_array_of_samples()))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 67,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "files = os.listdir('./calc_recordings/')\n",
+    "noisy_calc_df = pd.DataFrame(columns=['labels', 'mfcc'])\n",
+    "for file in files:\n",
+    "    if file[-4:]=='.wav':\n",
+    "        filepath = './calc_recordings/'+file\n",
+    "        mfcc = split_then_get_noisy_mfcc_from_filepath(filepath)\n",
+    "        name = file[:-4]\n",
+    "        noisy_calc_df = noisy_calc_df.append({'labels': calc_filename_to_labels(name), 'mfcc': mfcc}, ignore_index=True)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 68,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "noisy_predictions_all = pred_labels_calculator(noisy_calc_df['mfcc'])\n",
+    "noisy_calc_out_pred = predictions_to_evaluations(noisy_predictions_all)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 69,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "calc-out-acc: 0.0\n"
+     ]
+    }
+   ],
+   "source": [
+    "correct = 0\n",
+    "for i in range(len(calc_out_actual)):\n",
+    "    if not noisy_calc_out_pred[i]:\n",
+    "        continue\n",
+    "    correct += calc_out_actual[i] == noisy_calc_out_pred[i]\n",
+    "print(\"calc-out-acc:\", sum(correct_calc)/len(calc_out_actual))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 70,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "per-char-acc: 0.06000000000000001\n"
+     ]
+    }
+   ],
+   "source": [
+    "idx = 0\n",
+    "accuracies =[]\n",
+    "for predictions in noisy_predictions_all:\n",
+    "    accuracies.append(per_char_acc(predictions, calc_df['labels'][idx]))\n",
+    "print(\"per-char-acc:\", sum(accuracies)/len(accuracies))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### 3.20 Let's try adding other kinds of noise. \n",
+    "\n",
+    "#### One option to add environmental noise is to use a `audio event` wave file and `overlay` it over the original wave file. `Overlay` the file provided on the canvas `running_tap.wav` at varying soundlevels onto the original wave files in the test set of digits and operators. How well does the already trained HMM perform on these noisy samples (Use functions from `3.8`)?"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### 3.21 `Overlay` the file provided on the canvas `running_tap.wav` at varying soundlevels onto the spoken calculation string wave files. How well does the already trained HMM perform on these noisy samples (Use functions from `3.14` and `3.15`)?"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 71,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "def get_overlaid_mfcc_from_filepath(filepath, o_loudness): #used when one digit is in the recording\n",
+    "    sound = pydub.AudioSegment.from_file(filepath, format=\"wav\")\n",
+    "    return get_overlaid_mfcc_from_Audiosegment(sound, o_loudness)\n",
+    "\n",
+    "def get_overlaid_mfcc_from_Audiosegment(sound, o_loudness): #used when one digit is in the recording\n",
+    "    overlay = pydub.AudioSegment.from_file(\"running_tap.wav\", format=\"wav\")\n",
+    "    overlay_test_dfs = []\n",
+    "    overlay = overlay + o_loudness\n",
+    "    combined = sound.overlay(overlay)\n",
+    "    chunk_size = 10\n",
+    "    first_noisy_idx = int(detect_leading_silence(sound, chunk_size=chunk_size))\n",
+    "    combined = combined[first_noisy_idx:]\n",
+    "    return psf.mfcc(np.array(combined.get_array_of_samples()))\n",
+    "    \n",
+    "def split_then_get_overlay_mfcc_from_filepath(filepath, o_loudness): #used when multiple digits are in the same recording\n",
+    "    split_clips = audio_splitter(filepath)\n",
+    "    total_mfccs = []\n",
+    "    for clip in split_clips:\n",
+    "        total_mfccs.append(get_overlaid_mfcc_from_Audiosegment(clip, o_loudness))\n",
+    "    return total_mfccs\n",
+    "\n",
+    "def evaluate_with_df(df_eval): #evaluate against the calculator recordings I made\n",
+    "    predictions_all = pred_labels_calculator(df_eval['mfcc'])\n",
+    "    calc_out_pred = predictions_to_evaluations(predictions_all)\n",
+    "    \n",
+    "    correct = 0\n",
+    "    for i in range(len(calc_out_actual)):\n",
+    "        if not calc_out_pred[i]:\n",
+    "            continue\n",
+    "        correct += calc_out_actual[i] == calc_out_pred[i]\n",
+    "    print(\"calc-out-acc:\", sum(correct_calc)/len(calc_out_actual))\n",
+    "    \n",
+    "    idx = 0\n",
+    "    accuracies =[]\n",
+    "    for predictions in predictions_all:\n",
+    "        accuracies.append(per_char_acc(predictions, calc_df['labels'][idx]))\n",
+    "    print(\"per-char-acc:\", sum(accuracies)/len(accuracies))\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 72,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "\n",
+      "\n",
+      "overlay_loudness: -40\n",
+      "accuracy on digits: 0.7558488302339532\n",
+      "calc-out-acc: 0.0\n",
+      "per-char-acc: 0.0\n",
+      "\n",
+      "\n",
+      "overlay_loudness: -30\n",
+      "accuracy on digits: 0.6706658668266346\n",
+      "calc-out-acc: 0.0\n",
+      "per-char-acc: 0.0\n",
+      "\n",
+      "\n",
+      "overlay_loudness: -20\n",
+      "accuracy on digits: 0.48470305938812236\n",
+      "calc-out-acc: 0.0\n",
+      "per-char-acc: 0.0\n"
+     ]
+    }
+   ],
+   "source": [
+    "for o_loudness in [-40, -30, -20]:\n",
+    "    overlay_test_df = df.loc[indices]\n",
+    "    overlay_test_df['mfcc'] = df['filepath'].apply(get_overlaid_mfcc_from_filepath,args=(o_loudness,)) \n",
+    "    \n",
+    "    overlay_calc_df = pd.DataFrame(columns=['labels', 'mfcc'])\n",
+    "    for file in files:\n",
+    "        if file[-4:]=='.wav':\n",
+    "            filepath = './calc_recordings/'+file\n",
+    "            mfcc = split_then_get_overlay_mfcc_from_filepath(filepath,o_loudness)\n",
+    "            name = file[:-4]\n",
+    "            overlay_calc_df = overlay_calc_df.append({'labels': calc_filename_to_labels(name), 'mfcc': mfcc}, ignore_index=True)\n",
+    "    \n",
+    "    prediction = predict_labels_from_df(full_models, overlay_test_df)\n",
+    "    accuracy = ((prediction == test_df['label'])).sum()/prediction.shape[0]\n",
+    "    print(\"\\n\\noverlay_loudness:\", o_loudness)\n",
+    "    print(\"accuracy on digits:\",accuracy)\n",
+    "    \n",
+    "    #this function evluates against the calculator recordings I made\n",
+    "    evaluate_with_df(overlay_calc_df)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Extra credit\n",
+    "#### 3.22 Accent issues. Type the same spoken calculation string commands into accent readers ([Read the words](https://www.readthewords.com/Try.aspx), [text2speech](https://www.text2speech.org/)) and download wav files for various accented speech. Upload these files onto drive and link them here as well. How well does the already trained HMM perform on these accented samples (Use functions from `3.14` and `3.15`)?"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 73,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "calc-out-acc: 0.0\n",
+      "per-char-acc: 0.0\n"
+     ]
+    }
+   ],
+   "source": [
+    "files = os.listdir('./accent_recordings/')\n",
+    "accent_df = pd.DataFrame(columns=['labels', 'mfcc'])\n",
+    "for file in files:\n",
+    "    if file[-4:]=='.wav':\n",
+    "        filepath = './accent_recordings/'+file\n",
+    "        mfcc = split_then_mffc_clip(filepath)\n",
+    "        name = file[:-4]\n",
+    "        accent_df = accent_df.append({'labels': calc_filename_to_labels(name), 'mfcc': mfcc}, ignore_index=True)\n",
+    "evaluate_with_df(accent_df)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "https://drive.google.com/drive/folders/12-p6A9ipUrTrEvczBZwjiHWkzoQ48CGK?usp=sharing"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### 3.23 Quantity of data. How much data do you need to get a good classifier? For low resource languages, this is an important concern to deal with.\n",
+    "\n",
+    "#### On original digit and operator dataset, train HMM models using varying amounts of train data (10%, 20%..90%, 100% of the train samples for each digit and operator), and plot the performance on the complete test set for each of these levels (in one plot using `matplotlib` or `seaborn`)."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#code goes here"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### 3.24 For what percentages do you get the least, median and best performance?"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "_answer in text goes here_"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### Extra Credit\n",
+    "\n",
+    "#### 3.25 Data augmentation. We will augment the data with various noisy samples to improve performance of the model. Obtain noisy samples for the train set of digits and operators by overlaying `WhiteNoise` and `running_tap.wav`. Retrain the HMM models for each digit and operator using the noisy samples and the clean samples together. \n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#code goes here"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### 3.26 Perform steps 3.16 to 3.19 again. Do you see any difference in performance?"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#code goes here"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### 3.27 What other method can you think of to augment the dataset? Some possibilities are accent (use the method in `3.18` and download samples for each digit and operator separately), echos, drops (the start or end of the spoken digit is cut off), speed etc.\n",
+    "\n",
+    "#### Note: You do not neccessarily need to think of something out of the list mentioned. "
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "_answer in text goes here_"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### 3.28 Augment the train and test dataset using the method chosen above. Then retrain your HMM on the augmented train set and test on the augmented test set, and report the results, for augmentation of each digit and operator separately (use `3.8`) and for the spoken calculation string wave files (use `3.14` and `3.15`)."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#code for each digit and operator train+test goes here"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#code for spoken calculation string wave files goes here"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### 3.29 Quantity of data. How much data do you need to augment to get a good classifier?\n",
+    "\n",
+    "#### This time augment the dataset by polluting 10%, 20%..90%, 100% of the train samples for each digit and operator. Include `x%` of the original train data where x are the three percentages levels obtained in `3.20`. \n",
+    "\n",
+    "#### _So, if your best performance was at 100%, worst at 10% and median at 70%, train HMM models for each digit and operator with the train set being (100% original +10% 20% samples augmented with noise), (100% original+20% samples augmented with noise) ... (100% original+ 100% samples augmented with noise), (70% original +10% 20% samples augmented with noise), (70% original+20% samples augmented with noise) ... (70% original+ 100% samples augmented with noise), (10% original +10% 20% samples augmented with noise), (10% original+20% samples augmented with noise) ... (10% original+ 100% samples augmented with noise)._\n",
+    "\n",
+    "#### Plot the performance on the complete test set (original+noise augmented) performance for each of these levels (in three plots, one each for `x%` clean train samples, using `matplotlib` or `seaborn`)."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#code goes here"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "#### 3.30 Which combination saw the highest jump in performance as compared to that in 3.19? Calculate the percentage increase in performance of the HMM model."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#code goes here"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.6.5"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 2
+}

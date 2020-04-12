@@ -16,7 +16,7 @@ import matplotlib.pyplot as plt
 
 import numpy as np
 import pandas as pd
-import torch
+#import torch
 
 
 def read_mp3(f, normalized=False):
@@ -63,9 +63,9 @@ def detect_leading_silence_filepath(filepath):
 
 
 def extract_mfcc(sound):
-    chunk_size = 10
-    first_noisy_idx = int(detect_leading_silence(sound, chunk_size=chunk_size))
-    sound = sound[first_noisy_idx:]
+    #chunk_size = 10
+    #first_noisy_idx = int(detect_leading_silence(sound, chunk_size=chunk_size))
+    #sound = sound[first_noisy_idx:]
     
     # TODO: Should we uncomment this? how to get rid of warning?
     # return mfcc(np.array(sound.get_array_of_samples()), samplerate=sound.frame_rate)
@@ -105,6 +105,6 @@ def length_of_file(filepath):
 
 
 def zero_pad_in_end(audio, max_length):
-    length = max_length - len(audio)  
+    length = max_length - len(audio)
     output = audio + AudioSegment.silent(duration=length)
     return output

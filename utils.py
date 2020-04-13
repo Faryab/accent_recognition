@@ -10,7 +10,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 from time import sleep
 import scipy.io.wavfile as wav
-from glob import glob
+import glob
 import seaborn as sns
 import matplotlib.pyplot as plt
 
